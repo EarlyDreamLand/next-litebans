@@ -77,7 +77,7 @@ export const PunishmentInfoCard = async ({ punishment, children }: PunishmentInf
             <ConsoleAvatar name={punishment.banned_by_name!} size={28} className="!mx-0 mr-1" />
             :
             <img 
-              src={`https://visage.surgeplay.com/face/128/${punishment.banned_by_uuid}`}
+              src={`${process.env.NEXT_PUBLIC_VZGEFACE_URL}${getSkinUUID(punishment.banned_by_name!, punishment.banned_by_uuid!)}`}
               alt={`${punishment.banned_by_name}'s avatar`}
               width={28}
               height={28}
