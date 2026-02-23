@@ -29,7 +29,7 @@ const language = {
     staff: "管理",
     reason: "原因",
     date: "日期",
-    expires: "过期时间",
+    expires: "失效时间",
     originServer: "来源服务器",
     notified: "通知",
   },
@@ -50,14 +50,14 @@ const language = {
           by: "处理",
           reason: "原因",
           date: "日期",
-          expires: "过期时间"
+          expires: "失效时间"
         },
         permanent: "永久封禁",
         expire_not_applicable: "N/A",
         active: {
           true: "生效",
           temporal: "临时",
-          false: "过期"
+          false: "失效"
         }
       }
     },
@@ -71,13 +71,13 @@ const language = {
           by: "处理",
           reason: "原因",
           date: "日期",
-          expires: "过期时间"
+          expires: "失效时间"
         },
         permanent: "永久封禁",
         active: {
           true: "生效",
           temporal: "临时",
-          false: "过期"
+          false: "失效"
         }
       },
       info: {
@@ -85,7 +85,7 @@ const language = {
         badges: {
           ipban: "IP封禁",
           active: "生效",
-          expired: "过期",
+          expired: "失效",
           permanent: "永久",
         }
       }
@@ -100,13 +100,13 @@ const language = {
           by: "处理",
           reason: "原因",
           date: "日期",
-          expires: "过期时间"
+          expires: "失效时间"
         },
         permanent: "永久禁言",
         active: {
           true: "生效",
           temporal: "临时",
-          false: "过期"
+          false: "失效"
         }
       },
       info: {
@@ -114,7 +114,7 @@ const language = {
         badges: {
           ipmute: "IP禁言",
           active: "生效",
-          expired: "过期",
+          expired: "失效",
           permanent: "永久",
         }
       }
