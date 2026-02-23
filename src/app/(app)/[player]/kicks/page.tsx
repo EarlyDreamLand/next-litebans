@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: { params: { player: string } 
       player: params.player.replace("%40", '')
     }),
     openGraph: {
-      images: `https://minotar.net/helm/${player.uuid}`,
+      images: `${process.env.AVATAR_URL || 'https://minotar.net/helm/'}${player.uuid}`,
       description: p(siteConfig.openGraph.pages.player.kicks.description, {
         name: player.name,
         total: kickCount
