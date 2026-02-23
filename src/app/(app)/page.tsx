@@ -20,11 +20,11 @@ export async function generateMetadata() {
     openGraph: {
       images: process.env.SITE_URL + siteConfig.logo,
       description: p(siteConfig.openGraph.pages.main.description, {
-        bans: await db.litebans_bans.count(),
-        mutes: await db.litebans_mutes.count(),
-        warns: await db.litebans_warnings.count(),
-        kicks: await db.litebans_kicks.count(),
-        total: await db.litebans_bans.count() + await db.litebans_mutes.count() + await db.litebans_warnings.count() + await db.litebans_kicks.count()
+        bans: await db.bans.count(),
+        mutes: await db.mutes.count(),
+        warns: await db.warnings.count(),
+        kicks: await db.kicks.count(),
+        total: await db.bans.count() + await db.mutes.count() + await db.warnings.count() + await db.kicks.count()
       })
     }
   }
@@ -33,10 +33,10 @@ export async function generateMetadata() {
 export default async function Home(searchParams: SearchParams) {
   const { dictionary } = await language();
 
-  const banCount = await db.litebans_bans.count();
-  const muteCount = await db.litebans_mutes.count();
-  const warnCount = await db.litebans_warnings.count();
-  const kickCount = await db.litebans_kicks.count();
+  const banCount = await db.bans.count();
+  const muteCount = await db.mutes.count();
+  const warnCount = await db.warnings.count();
+  const kickCount = await db.kicks.count();
 
   const page = getPage(searchParams);
   const player = getPlayer(searchParams);

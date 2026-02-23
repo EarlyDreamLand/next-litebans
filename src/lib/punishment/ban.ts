@@ -8,7 +8,7 @@ import { getPlayerName } from "./punishment";
 import { Dictionary } from "../language/types";
 
 const getBanCount = async (player?: string, staff?: string) => {
-  const count = await db.litebans_bans.count({
+  const count = await db.bans.count({
     where: {
       uuid: player,
       banned_by_uuid: staff
@@ -18,7 +18,7 @@ const getBanCount = async (player?: string, staff?: string) => {
 }
 
 const getBans = async (page: number, player?: string, staff?: string) => {
-  const bans =  (await db.litebans_bans.findMany({
+  const bans =  (await db.bans.findMany({
     where: {
       uuid: player,
       banned_by_uuid: staff
@@ -68,7 +68,7 @@ const sanitizeBans = async (dictionary: Dictionary, bans: PunishmentListItem[]) 
 }
 
 const getBan = async (id: number, dictionary: Dictionary) => {
-  const ban = await db.litebans_bans.findUnique({
+  const ban = await db.bans.findUnique({
     where: {
       id
     },

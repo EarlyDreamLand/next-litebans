@@ -13,10 +13,10 @@ export async function generateMetadata() {
   
   const { dictionary } = await language();
 
-  const banCount = await db.litebans_bans.count();
-  const muteCount = await db.litebans_mutes.count();
-  const warnCount = await db.litebans_warnings.count();
-  const kickCount = await db.litebans_kicks.count();
+  const banCount = await db.bans.count();
+  const muteCount = await db.mutes.count();
+  const warnCount = await db.warnings.count();
+  const kickCount = await db.kicks.count();
   
   return {
     title: dictionary.pages.history.title,

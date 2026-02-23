@@ -7,7 +7,7 @@ import { db } from "../db";
 import { getPlayerName } from "./punishment";
 
 const getKickCount = async (player?: string, staff?: string) => {
-  const count = await db.litebans_kicks.count({
+  const count = await db.kicks.count({
     where: {
       uuid: player,
       banned_by_uuid: staff
@@ -17,7 +17,7 @@ const getKickCount = async (player?: string, staff?: string) => {
 }
 
 const getKicks = async (page: number, player?: string, staff?: string) => {
-  const kicks =  await db.litebans_kicks.findMany({
+  const kicks =  await db.kicks.findMany({
     where: {
       uuid: player,
       banned_by_uuid: staff
@@ -60,7 +60,7 @@ const sanitizeKicks = async (kicks: PunishmentListItem[]) => {
 }
 
 const getKick = async (id: number) => {
-  const kick = await db.litebans_kicks.findUnique({
+  const kick = await db.kicks.findUnique({
     where: {
       id
     },

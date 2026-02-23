@@ -8,7 +8,7 @@ import { getPlayerName } from "./punishment";
 import { Dictionary } from "../language/types";
 
 const getMuteCount = async (player?: string, staff?: string) => {
-  const count = await db.litebans_mutes.count({
+  const count = await db.mutes.count({
     where: {
       uuid: player,
       banned_by_uuid: staff
@@ -18,7 +18,7 @@ const getMuteCount = async (player?: string, staff?: string) => {
 }
 
 const getMutes = async (page: number, player?: string, staff?: string) => {
-  const mutes =  await db.litebans_mutes.findMany({
+  const mutes =  await db.mutes.findMany({
     where: {
       uuid: player,
       banned_by_uuid: staff
@@ -68,7 +68,7 @@ const sanitizeMutes = async (dictionary: Dictionary, mutes: PunishmentListItem[]
 }
 
 const getMute = async (id: number, dictionary: Dictionary) => {
-  const mute = await db.litebans_mutes.findUnique({
+  const mute = await db.mutes.findUnique({
     where: {
       id
     },

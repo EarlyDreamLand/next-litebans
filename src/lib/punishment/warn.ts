@@ -7,7 +7,7 @@ import { db } from "../db";
 import { getPlayerName } from "./punishment";
 
 const getWarnCount = async (player?: string, staff?: string) => {
-  const count = await db.litebans_warnings.count({
+  const count = await db.warnings.count({
     where: {
       uuid: player,
       banned_by_uuid: staff
@@ -17,7 +17,7 @@ const getWarnCount = async (player?: string, staff?: string) => {
 }
 
 const getWarns = async (page: number, player?: string, staff?: string) => {
-  const warns =  await db.litebans_warnings.findMany({
+  const warns =  await db.warnings.findMany({
     where: {
       uuid: player,
       banned_by_uuid: staff
@@ -62,7 +62,7 @@ const sanitizeWarns = async (warns: (PunishmentListItem & { warned: boolean | st
 }
 
 const getWarn = async (id: number) => {
-  const warn = await db.litebans_warnings.findUnique({
+  const warn = await db.warnings.findUnique({
     where: {
       id
     },

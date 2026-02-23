@@ -7,13 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model litebans_allow {
+model allow {
   id   BigInt @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   uuid Bytes  @db.Binary(16)
   type Int    @db.UnsignedTinyInt
+
+  @@map("{{PREFIX}}allow")
 }
 
-model litebans_bans {
+model bans {
   id                BigInt   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   uuid              String?  @db.VarChar(36)
   ip                String?  @db.VarChar(45)
@@ -33,24 +35,30 @@ model litebans_bans {
   ipban             Boolean  @db.Bit(1)
   ipban_wildcard    Boolean  @default(dbgenerated("(b'0')")) @db.Bit(1)
   active            Boolean  @db.Bit(1)
+
+  @@map("{{PREFIX}}bans")
 }
 
-model litebans_config {
+model config {
   id       BigInt @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   version  String @db.VarChar(128)
   build    String @db.VarChar(128)
   timezone String @default("+00:00") @db.VarChar(64)
+
+  @@map("{{PREFIX}}config")
 }
 
-model litebans_history {
+model history {
   id   BigInt   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   date DateTime @default(now()) @db.Timestamp(0)
   name String?  @db.VarChar(16)
   uuid String?  @db.VarChar(36)
   ip   String?  @db.VarChar(45)
+
+  @@map("{{PREFIX}}history")
 }
 
-model litebans_kicks {
+model kicks {
   id             BigInt  @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   uuid           String? @db.VarChar(36)
   ip             String? @db.VarChar(45)
@@ -66,9 +74,11 @@ model litebans_kicks {
   ipban          Boolean @db.Bit(1)
   ipban_wildcard Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
   active         Boolean @db.Bit(1)
+
+  @@map("{{PREFIX}}kicks")
 }
 
-model litebans_mutes {
+model mutes {
   id                BigInt   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   uuid              String?  @db.VarChar(36)
   ip                String?  @db.VarChar(45)
@@ -88,23 +98,29 @@ model litebans_mutes {
   ipban             Boolean  @db.Bit(1)
   ipban_wildcard    Boolean  @default(dbgenerated("(b'0')")) @db.Bit(1)
   active            Boolean  @db.Bit(1)
+
+  @@map("{{PREFIX}}mutes")
 }
 
-model litebans_servers {
+model servers {
   id   BigInt   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   name String   @db.VarChar(32)
   uuid String   @db.VarChar(32)
   date DateTime @default(now()) @db.Timestamp(0)
+
+  @@map("{{PREFIX}}servers")
 }
 
-model litebans_sync {
+model sync {
   id   BigInt   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   info Int      @db.UnsignedInt
   msg  String   @db.VarChar(4096)
   time DateTime @default(now()) @db.Timestamp(0)
+
+  @@map("{{PREFIX}}sync")
 }
 
-model litebans_warnings {
+model warnings {
   id                BigInt   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   uuid              String?  @db.VarChar(36)
   ip                String?  @db.VarChar(45)
@@ -125,4 +141,6 @@ model litebans_warnings {
   ipban_wildcard    Boolean  @default(dbgenerated("(b'0')")) @db.Bit(1)
   active            Boolean  @db.Bit(1)
   warned            Boolean  @db.Bit(1)
+
+  @@map("{{PREFIX}}warnings")
 }
