@@ -7,7 +7,7 @@ import { buttonVariants } from "@/components/ui/button";
 
 export const GithubButton = () => (
   <Link
-    href="https://github.com/yosoyvillaa/next-litebans"
+    href="https://github.com/EarlyDreamLand/next-litebans"
     target="_blank"
     rel="noreferrer"
   >

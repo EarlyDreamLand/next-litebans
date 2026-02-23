@@ -1,13 +1,14 @@
 export const siteConfig = {
-  title: "Next Litebans",
+  title: "初梦大陆违规查询系统",
   logo: "/logo.webp",
   favicon: "/logo.webp",
   languages: {
     available: [
       "en",
       "es",
+      "zh-CN",
     ],
-    default: "en",
+    default: "zh-CN",
   },
   console: {
     name: "Console", // Just for filter badge
@@ -16,7 +17,7 @@ export const siteConfig = {
     body: "/console-body.webp",
     bust: "/console-bust.webp",
   },
-  defaultPlayerLookup: "YoSoyVilla",
+  defaultPlayerLookup: "nuoxian",
   // When enabled, body and bust images will show a steve skin
   bedrock: {
     enabled: false,
