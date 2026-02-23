@@ -51,14 +51,21 @@ const getPlayerName = async (uuid: string) => {
 }
 
 const getPunishments = async (page: number, player?: string, staff?: string) => {
+  const prefix = process.env.DB_PREFIX || 'litebans_';
+
+  const tableBans = Prisma.raw(prefix + 'bans');
+  const tableMutes = Prisma.raw(prefix + 'mutes');
+  const tableWarnings = Prisma.raw(prefix + 'warnings');
+  const tableKicks = Prisma.raw(prefix + 'kicks');
+
   const query = Prisma.sql`
-  SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'ban' AS type FROM bans ${player || staff ? Prisma.sql`WHERE ` : Prisma.sql``}${player ? Prisma.sql` uuid = ${player} ` : Prisma.sql``} ${player && staff ? Prisma.sql`AND` : Prisma.sql``} ${staff ? Prisma.sql` banned_by_uuid = ${staff}` : Prisma.sql``}
+  SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'ban' AS type FROM ${tableBans} ${player || staff ? Prisma.sql`WHERE ` : Prisma.sql``}${player ? Prisma.sql` uuid = ${player} ` : Prisma.sql``} ${player && staff ? Prisma.sql`AND` : Prisma.sql``} ${staff ? Prisma.sql` banned_by_uuid = ${staff}` : Prisma.sql``}
   UNION ALL 
-  SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'mute' AS type FROM mutes ${player || staff ? Prisma.sql`WHERE ` : Prisma.sql``}${player ? Prisma.sql` uuid = ${player} ` : Prisma.sql``} ${player && staff ? Prisma.sql`AND` : Prisma.sql``} ${staff ? Prisma.sql` banned_by_uuid = ${staff}` : Prisma.sql``}
+  SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'mute' AS type FROM ${tableMutes} ${player || staff ? Prisma.sql`WHERE ` : Prisma.sql``}${player ? Prisma.sql` uuid = ${player} ` : Prisma.sql``} ${player && staff ? Prisma.sql`AND` : Prisma.sql``} ${staff ? Prisma.sql` banned_by_uuid = ${staff}` : Prisma.sql``}
   UNION ALL 
-  SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'warn' AS type FROM warnings ${player || staff ? Prisma.sql`WHERE ` : Prisma.sql``}${player ? Prisma.sql` uuid = ${player} ` : Prisma.sql``} ${player && staff ? Prisma.sql`AND` : Prisma.sql``} ${staff ? Prisma.sql` banned_by_uuid = ${staff}` : Prisma.sql``}
+  SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'warn' AS type FROM ${tableWarnings} ${player || staff ? Prisma.sql`WHERE ` : Prisma.sql``}${player ? Prisma.sql` uuid = ${player} ` : Prisma.sql``} ${player && staff ? Prisma.sql`AND` : Prisma.sql``} ${staff ? Prisma.sql` banned_by_uuid = ${staff}` : Prisma.sql``}
   UNION ALL 
-  SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'kick' AS type FROM kicks ${player || staff ? Prisma.sql`WHERE ` : Prisma.sql``}${player ? Prisma.sql` uuid = ${player} ` : Prisma.sql``} ${player && staff ? Prisma.sql`AND` : Prisma.sql``} ${staff ? Prisma.sql` banned_by_uuid = ${staff}` : Prisma.sql``}
+  SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'kick' AS type FROM ${tableKicks} ${player || staff ? Prisma.sql`WHERE ` : Prisma.sql``}${player ? Prisma.sql` uuid = ${player} ` : Prisma.sql``} ${player && staff ? Prisma.sql`AND` : Prisma.sql``} ${staff ? Prisma.sql` banned_by_uuid = ${staff}` : Prisma.sql``}
   ORDER BY time DESC
   LIMIT 10
   OFFSET ${(page - 1) * 10}
