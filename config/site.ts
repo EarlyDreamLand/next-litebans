@@ -1,5 +1,5 @@
 export const siteConfig = {
-  title: "初梦大陆违规查询系统",
+  title: "Next Litebans",
   logo: "/logo.webp",
   favicon: "/logo.webp",
   languages: {
