@@ -28,7 +28,7 @@ _P.D: All punishments in the demo are randomly added to the database with a list
 3. Copy the `.env.example` file to `.env` and fill in the required fields. For help [check this](#database-url)
 4. If you are using PostgreSQL, check [PostgresSQL Configuration](#PostgresSQL-Configuration)
 5. Config the website ([configuration](#%EF%B8%8F-configuration))
-6. Run `npm run db:schema` to generate the database schema
+6. Run `npm run setup:db:schema` to generate the database schema
 7. Run `npm run setup:db:generate` to generate the Prisma client
 8. Run `npm run build` to build the project
 9. Run `npm run start` to start the server

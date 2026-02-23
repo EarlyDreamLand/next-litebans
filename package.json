@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "setup:db:schema": "node scripts/generate-schema.js",
     "setup:db:generate": "prisma generate",
     "setup:db:pull": "prisma db pull"
   },
@@ -22,6 +23,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
+    "dotenv": "^17.3.1",
     "lucide-react": "^0.378.0",
     "motion-number": "^0.1.6",
     "next": "14.2.25",
