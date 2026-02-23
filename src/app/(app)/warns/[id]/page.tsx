@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
       id: params.id
     }),
     openGraph: {
-      images: `${process.env.AVATAR_URL || 'https://minotar.net/helm/'}${warn?.uuid ?? warn?.name}`,
+      images: `${process.env.NEXT_PUBLIC_AVATAR_URL}${warn?.uuid ?? warn?.name}`,
       description: p(siteConfig.openGraph.punishments.warn.description, {
         name: warn.name,
         staff: warn.banned_by_name,

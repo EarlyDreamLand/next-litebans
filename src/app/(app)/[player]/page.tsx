@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: { params: { player: string } 
       player: params.player.replace("%40", '')
     }),
     openGraph: {
-      images: `${process.env.AVATAR_URL || 'https://minotar.net/helm/'}${player.uuid}`,
+      images: `${process.env.NEXT_PUBLIC_AVATAR_URL}${player.uuid}`,
       description: p(siteConfig.openGraph.pages.player.description, {
         name: player.name,
         bans: banCount,

@@ -16,7 +16,7 @@ export const PlayerAvatar = ({
   className
 }: PlayerAvatarProps) => (
   <Image 
-    src={`${process.env.AVATAR_URL || 'https://minotar.net/helm/'}${uuid ?? name}`}
+    src={`${process.env.NEXT_PUBLIC_AVATAR_URL}${uuid ?? name}`}
     alt={`${name}'s avatar`}
     width={size ?? 32}
     height={size ?? 32}
