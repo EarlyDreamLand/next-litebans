@@ -49,7 +49,7 @@ const getPlayerName = async (uuid: string) => {
 }
 
 const getPlayerNamesBatch = async (uuids: string[]): Promise<Map<string, string | undefined>> => {
-  const uniqueUuids = [...new Set(uuids.filter((u): u is string => !!u))];
+  const uniqueUuids = Array.from(new Set(uuids.filter((u): u is string => !!u)));
   if (uniqueUuids.length === 0) return new Map();
 
   const players = await db.history.findMany({
