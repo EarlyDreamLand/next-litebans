@@ -17,7 +17,7 @@ export async function generateMetadata() {
   return {
     title: dictionary.pages.bans.title,
     openGraph: {
-      images: process.env.SITE_URL + siteConfig.logo,
+      images: (process.env.SITE_URL ?? "") + siteConfig.logo,
       description: p(siteConfig.openGraph.pages.bans.description, {
         total: banCount
       })

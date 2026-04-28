@@ -23,7 +23,7 @@ export async function generateMetadata() {
     },
     description: dictionary.site.description,
     openGraph: {
-      images: process.env.SITE_URL + siteConfig.logo,
+      images: (process.env.SITE_URL ?? "") + siteConfig.logo,
     },
     twitter: {
       card: "summary",

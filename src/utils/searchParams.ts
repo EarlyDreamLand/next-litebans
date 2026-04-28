@@ -1,11 +1,15 @@
 import { SearchParams } from "@/types";
 import { siteConfig } from "@config/site";
 
+const MAX_PAGE = 10000;
+
 const getPage = ({ searchParams }: SearchParams) => {
   let page = searchParams.page ? parseInt(searchParams.page as string) : 1;
 
   if (isNaN(page) || page < 1) {
     page = 1;
+  } else if (page > MAX_PAGE) {
+    page = MAX_PAGE;
   }
 
   return page;
