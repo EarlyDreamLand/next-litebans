@@ -23,7 +23,7 @@ _P.D: All punishments in the demo are randomly added to the database with a list
 
 ### Installation
 
-1. Clone the repository with `git clone https://github.com/YoSoyVillaa/next-litebans.git`
+1. Clone the repository with `git clone https://github.com/EarlyDreamLand/next-litebans.git`
 2. Install the dependencies with `npm install`
 3. Copy the `.env.example` file to `.env` and fill in the required fields. For help [check this](#database-url)
 4. If you are using PostgreSQL, check [PostgresSQL Configuration](#PostgresSQL-Configuration)
