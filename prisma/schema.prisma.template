@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model allow {
+model {{PREFIX}}allow {
   id   BigInt @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   uuid Bytes  @db.Binary(16)
   type Int    @db.UnsignedTinyInt
@@ -15,7 +15,7 @@ model allow {
   @@map("{{PREFIX}}allow")
 }
 
-model bans {
+model {{PREFIX}}bans {
   id                BigInt   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   uuid              String?  @db.VarChar(36)
   ip                String?  @db.VarChar(45)
@@ -39,7 +39,7 @@ model bans {
   @@map("{{PREFIX}}bans")
 }
 
-model config {
+model {{PREFIX}}config {
   id       BigInt @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   version  String @db.VarChar(128)
   build    String @db.VarChar(128)
@@ -48,7 +48,7 @@ model config {
   @@map("{{PREFIX}}config")
 }
 
-model history {
+model {{PREFIX}}history {
   id   BigInt   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   date DateTime @default(now()) @db.Timestamp(0)
   name String?  @db.VarChar(16)
@@ -58,7 +58,7 @@ model history {
   @@map("{{PREFIX}}history")
 }
 
-model kicks {
+model {{PREFIX}}kicks {
   id             BigInt  @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   uuid           String? @db.VarChar(36)
   ip             String? @db.VarChar(45)
@@ -78,7 +78,7 @@ model kicks {
   @@map("{{PREFIX}}kicks")
 }
 
-model mutes {
+model {{PREFIX}}mutes {
   id                BigInt   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   uuid              String?  @db.VarChar(36)
   ip                String?  @db.VarChar(45)
@@ -102,7 +102,7 @@ model mutes {
   @@map("{{PREFIX}}mutes")
 }
 
-model servers {
+model {{PREFIX}}servers {
   id   BigInt   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   name String   @db.VarChar(32)
   uuid String   @db.VarChar(32)
@@ -111,7 +111,7 @@ model servers {
   @@map("{{PREFIX}}servers")
 }
 
-model sync {
+model {{PREFIX}}sync {
   id   BigInt   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   info Int      @db.UnsignedInt
   msg  String   @db.VarChar(4096)
@@ -120,7 +120,7 @@ model sync {
   @@map("{{PREFIX}}sync")
 }
 
-model warnings {
+model {{PREFIX}}warnings {
   id                BigInt   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
   uuid              String?  @db.VarChar(36)
   ip                String?  @db.VarChar(45)
