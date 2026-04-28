@@ -5,7 +5,7 @@
 
   A web interface for [LiteBans](https://www.spigotmc.org/resources/litebans.3715/), built on top of:
 
-  [![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/) [![Prisma](https://img.shields.io/badge/Prisma-black?style=for-the-badge&logo=prisma&logoColor=white)](https://prisma.io/) [![shadcn/ui](https://cdn.yosoyvillaa.dev/uploads/shadcn.svg)](https://ui.shadcn.com/)
+  [![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/) [![Prisma](https://img.shields.io/badge/Prisma-black?style=for-the-badge&logo=prisma&logoColor=white)](https://prisma.io/) [![shadcn/ui](docs/images/shadcn.svg)](https://ui.shadcn.com/)
 </div>
 
 ## 👾 Demo
@@ -39,7 +39,7 @@ You will need to set the `DATABASE_URL` environment variable in the `.env` file.
 
 #### MySQL URL Configuration
 
-![MySQL](https://cdn.yosoyvillaa.dev/uploads/mysql.png)
+![MySQL](docs/images/mysql.png)
 
 ```env
 DATABASE_URL="mysql://user:password@host:port/database"
@@ -47,7 +47,7 @@ DATABASE_URL="mysql://user:password@host:port/database"
 
 #### PostgreSQL URL Configuration
 
-![PostgreSQL](https://cdn.yosoyvillaa.dev/uploads/postgresql.png)
+![PostgreSQL](docs/images/postgresql.png)
 
 ```env
 DATABASE_URL="postgresql://user:password@host:port/database?schema=public"
