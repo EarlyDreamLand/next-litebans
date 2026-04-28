@@ -6,18 +6,36 @@ import { PunishmentListItem } from "@/types";
 import { db } from "../db";
 import { getPlayerName } from "./punishment";
 
-const getKickCount = async (player?: string, staff?: string) => {
-  const count = await db.kicks.count({
+const kickCountCache = new Map();
+const KICK_CACHE_TTL = 15 * 60 * 1000; // 15 min
+
+const getKickCount = async (player?: string, staff?: string, useCache: boolean = true) => {
+  const cacheKey = `${player || 'null'}_${staff || 'null'}`;
+
+  if (useCache) {
+    const cached = kickCountCache.get(cacheKey);
+    if (cached && (Date.now() - cached.timestamp) < KICK_CACHE_TTL) {
+      return cached.data;
+    }
+  }
+
+  const count = await db.litebans_kicks.count({
     where: {
       uuid: player,
       banned_by_uuid: staff
     }
   });
+
+  kickCountCache.set(cacheKey, {
+    data: count,
+    timestamp: Date.now()
+  });
+
   return count;
 }
 
 const getKicks = async (page: number, player?: string, staff?: string) => {
-  const kicks =  await db.kicks.findMany({
+  const kicks =  await db.litebans_kicks.findMany({
     where: {
       uuid: player,
       banned_by_uuid: staff
@@ -60,7 +78,7 @@ const sanitizeKicks = async (kicks: PunishmentListItem[]) => {
 }
 
 const getKick = async (id: number) => {
-  const kick = await db.kicks.findUnique({
+  const kick = await db.litebans_kicks.findUnique({
     where: {
       id
     },

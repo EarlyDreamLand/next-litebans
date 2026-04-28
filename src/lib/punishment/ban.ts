@@ -7,18 +7,35 @@ import { db } from "../db";
 import { getPlayerName } from "./punishment";
 import { Dictionary } from "../language/types";
 
-const getBanCount = async (player?: string, staff?: string) => {
-  const count = await db.bans.count({
+const banCountCache = new Map();
+const BAN_CACHE_TTL = 15 * 60 * 1000; // 15 min
+
+const getBanCount = async (player?: string, staff?: string, useCache: boolean = true) => {
+  const cacheKey = `${player || 'null'}_${staff || 'null'}`;
+
+  if (useCache) {
+    const cached = banCountCache.get(cacheKey);
+    if (cached && (Date.now() - cached.timestamp) < BAN_CACHE_TTL) {
+      return cached.data;
+    }
+  }
+
+  const count = await db.litebans_bans.count({
     where: {
       uuid: player,
       banned_by_uuid: staff
     }
   });
+  banCountCache.set(cacheKey, {
+    data: count,
+    timestamp: Date.now()
+  });
+
   return count;
 }
 
 const getBans = async (page: number, player?: string, staff?: string) => {
-  const bans =  (await db.bans.findMany({
+  const bans =  (await db.litebans_bans.findMany({
     where: {
       uuid: player,
       banned_by_uuid: staff
@@ -68,7 +85,7 @@ const sanitizeBans = async (dictionary: Dictionary, bans: PunishmentListItem[]) 
 }
 
 const getBan = async (id: number, dictionary: Dictionary) => {
-  const ban = await db.bans.findUnique({
+  const ban = await db.litebans_bans.findUnique({
     where: {
       id
     },

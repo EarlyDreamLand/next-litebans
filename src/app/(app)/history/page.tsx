@@ -1,4 +1,3 @@
-import { db } from "@/lib/db";
 import { SearchParams } from "@/types";
 import p from "@/lib/language/utils/parse";
 import { language } from "@/lib/language/dictionaries";
@@ -13,21 +12,18 @@ export async function generateMetadata() {
   
   const { dictionary } = await language();
 
-  const banCount = await db.bans.count();
-  const muteCount = await db.mutes.count();
-  const warnCount = await db.warnings.count();
-  const kickCount = await db.kicks.count();
+  const { bans, mutes, warns, kicks } = await getPunishmentCount();
   
   return {
     title: dictionary.pages.history.title,
     openGraph: {
       images: process.env.SITE_URL + siteConfig.logo,
       description: p(siteConfig.openGraph.pages.history.description, {
-        bans: banCount,
-        mutes: muteCount,
-        warns: warnCount,
-        kicks: kickCount,
-        total: banCount + muteCount + warnCount + kickCount
+        bans: bans,
+        mutes: mutes,
+        warns: warns,
+        kicks: kicks,
+        total: bans + mutes + warns + kicks
       })
     }
   }

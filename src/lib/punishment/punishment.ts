@@ -4,38 +4,22 @@ import { PunishmentListItem } from "@/types";
 
 import { db } from "../db";
 import { Dictionary } from "../language/types";
+import {getBanCount} from "@/lib/punishment/ban";
+import {getMuteCount} from "@/lib/punishment/mute";
+import {getWarnCount} from "@/lib/punishment/warn";
+import {getKickCount} from "@/lib/punishment/kick";
 
 const getPunishmentCount = async (player?: string, staff?: string) => {
-  const bans = await db.bans.count({
-    where: {
-      uuid: player,
-      banned_by_uuid: staff
-    }
-  });
-  const mutes = await db.mutes.count({
-    where: {
-      uuid: player,
-      banned_by_uuid: staff
-    }
-  });
-  const warns = await db.warnings.count({
-    where: {
-      uuid: player,
-      banned_by_uuid: staff
-    }
-  });
-  const kicks = await db.kicks.count({
-    where: {
-      uuid: player,
-      banned_by_uuid: staff
-    }
-  });
+  const bans = await getBanCount(player, staff);
+  const mutes = await getMuteCount(player, staff);
+  const warns = await getWarnCount(player, staff);
+  const kicks = await getKickCount(player, staff);
 
   return { bans, mutes, warns, kicks }
 }
 
 const getPlayerName = async (uuid: string) => {
-  const player = await db.history.findFirst({
+  const player = await db.litebans_history.findFirst({
     where: {
       uuid
     },
@@ -51,28 +35,58 @@ const getPlayerName = async (uuid: string) => {
 }
 
 const getPunishments = async (page: number, player?: string, staff?: string) => {
-  const prefix = process.env.DB_PREFIX || 'litebans_';
+    const pageSize = 10;
+    const offset = (page - 1) * pageSize;
+    const subqueryLimit = offset + pageSize;
 
-  const tableBans = Prisma.raw(prefix + 'bans');
-  const tableMutes = Prisma.raw(prefix + 'mutes');
-  const tableWarnings = Prisma.raw(prefix + 'warnings');
-  const tableKicks = Prisma.raw(prefix + 'kicks');
+    const query = Prisma.sql`
+    SELECT * FROM (
+      SELECT * FROM (
+        SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'ban' AS type
+        FROM litebans_bans
+        WHERE 1=1
+          ${player ? Prisma.sql`AND uuid = ${player}` : Prisma.sql``}
+          ${staff ? Prisma.sql`AND banned_by_uuid = ${staff}` : Prisma.sql``}
+        ORDER BY time DESC
+          LIMIT ${subqueryLimit}
+      ) bans
+      UNION ALL
+      SELECT * FROM (
+        SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'mute' AS type
+        FROM litebans_mutes
+        WHERE 1=1
+          ${player ? Prisma.sql`AND uuid = ${player}` : Prisma.sql``}
+          ${staff ? Prisma.sql`AND banned_by_uuid = ${staff}` : Prisma.sql``}
+        ORDER BY time DESC
+          LIMIT ${subqueryLimit}
+      ) mutes
+      UNION ALL
+      SELECT * FROM (
+        SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'warn' AS type
+        FROM litebans_warnings
+        WHERE 1=1
+          ${player ? Prisma.sql`AND uuid = ${player}` : Prisma.sql``}
+          ${staff ? Prisma.sql`AND banned_by_uuid = ${staff}` : Prisma.sql``}
+        ORDER BY time DESC
+          LIMIT ${subqueryLimit}
+      ) warns
+      UNION ALL
+      SELECT * FROM (
+        SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'kick' AS type
+        FROM litebans_kicks
+        WHERE 1=1
+          ${player ? Prisma.sql`AND uuid = ${player}` : Prisma.sql``}
+          ${staff ? Prisma.sql`AND banned_by_uuid = ${staff}` : Prisma.sql``}
+        ORDER BY time DESC
+          LIMIT ${subqueryLimit}
+      ) kicks
+      ORDER BY time DESC
+        LIMIT ${pageSize}
+      OFFSET ${offset}
+    ) final_result
+  `;
 
-  const query = Prisma.sql`
-  SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'ban' AS type FROM ${tableBans} ${player || staff ? Prisma.sql`WHERE ` : Prisma.sql``}${player ? Prisma.sql` uuid = ${player} ` : Prisma.sql``} ${player && staff ? Prisma.sql`AND` : Prisma.sql``} ${staff ? Prisma.sql` banned_by_uuid = ${staff}` : Prisma.sql``}
-  UNION ALL 
-  SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'mute' AS type FROM ${tableMutes} ${player || staff ? Prisma.sql`WHERE ` : Prisma.sql``}${player ? Prisma.sql` uuid = ${player} ` : Prisma.sql``} ${player && staff ? Prisma.sql`AND` : Prisma.sql``} ${staff ? Prisma.sql` banned_by_uuid = ${staff}` : Prisma.sql``}
-  UNION ALL 
-  SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'warn' AS type FROM ${tableWarnings} ${player || staff ? Prisma.sql`WHERE ` : Prisma.sql``}${player ? Prisma.sql` uuid = ${player} ` : Prisma.sql``} ${player && staff ? Prisma.sql`AND` : Prisma.sql``} ${staff ? Prisma.sql` banned_by_uuid = ${staff}` : Prisma.sql``}
-  UNION ALL 
-  SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'kick' AS type FROM ${tableKicks} ${player || staff ? Prisma.sql`WHERE ` : Prisma.sql``}${player ? Prisma.sql` uuid = ${player} ` : Prisma.sql``} ${player && staff ? Prisma.sql`AND` : Prisma.sql``} ${staff ? Prisma.sql` banned_by_uuid = ${staff}` : Prisma.sql``}
-  ORDER BY time DESC
-  LIMIT 10
-  OFFSET ${(page - 1) * 10}
-  `
-  const punishments = await db.$queryRaw(query) as PunishmentListItem[];
-
-  return punishments;
+    return await db.$queryRaw(query) as PunishmentListItem[];
 }
 
 const sanitizePunishments = async (dictionary: Dictionary, punishments: PunishmentListItem[]) => {
