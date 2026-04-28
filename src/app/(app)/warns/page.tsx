@@ -18,7 +18,7 @@ export async function generateMetadata() {
   return {
     title: dictionary.pages.warns.title,
     openGraph: {
-      images: process.env.SITE_URL + siteConfig.logo,
+      images: (process.env.SITE_URL ?? "") + siteConfig.logo,
       description: p(siteConfig.openGraph.pages.warns.description, {
         total: warnCount
       })

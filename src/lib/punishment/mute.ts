@@ -1,39 +1,28 @@
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
 import { siteConfig } from "@config/site";
 import { PunishmentListItem } from "@/types";
 
 import { db } from "../db";
-import { getPlayerName } from "./punishment";
+import { getPlayerNamesBatch } from "./punishment";
 import { Dictionary } from "../language/types";
 
-const muteCountCache = new Map();
-const MUTE_CACHE_TTL = 15 * 60 * 1000; // 15 min
+const getMuteCountCached = unstable_cache(
+  async (player: string | null, staff: string | null) => {
+    return db.litebans_mutes.count({
+      where: {
+        uuid: player ?? undefined,
+        banned_by_uuid: staff ?? undefined
+      }
+    });
+  },
+  ["mute-count"],
+  { revalidate: 900 }
+);
 
-const getMuteCount = async (player?: string, staff?: string, useCache: boolean = true) => {
-  const cacheKey = `${player || 'null'}_${staff || 'null'}`;
-
-  if (useCache) {
-    const cached = muteCountCache.get(cacheKey);
-    if (cached && (Date.now() - cached.timestamp) < MUTE_CACHE_TTL) {
-      return cached.data;
-    }
-  }
-
-  const count = await db.litebans_mutes.count({
-    where: {
-      uuid: player,
-      banned_by_uuid: staff
-    }
-  });
-
-  muteCountCache.set(cacheKey, {
-    data: count,
-    timestamp: Date.now()
-  });
-
-  return count;
-}
+const getMuteCount = (player?: string, staff?: string) =>
+  getMuteCountCached(player ?? null, staff ?? null);
 
 const getMutes = async (page: number, player?: string, staff?: string) => {
   const mutes =  await db.litebans_mutes.findMany({
@@ -62,9 +51,11 @@ const getMutes = async (page: number, player?: string, staff?: string) => {
 }
 
 const sanitizeMutes = async (dictionary: Dictionary, mutes: PunishmentListItem[]) => {
+  const uuids = mutes.map(m => m.uuid).filter((u): u is string => !!u);
+  const nameMap = await getPlayerNamesBatch(uuids);
 
-  const sanitized = await Promise.all(mutes.map(async (mute) => {
-    const name = await getPlayerName(mute.uuid!);
+  const sanitized = mutes.map((mute) => {
+    const name = nameMap.get(mute.uuid!);
     const until = mute.until.toString() === "0" ? dictionary.table.permanent : new Date(parseInt(mute.until.toString()));
     const active = typeof mute.active === "boolean" ? mute.active : mute.active === "1";
     return {
@@ -72,15 +63,15 @@ const sanitizeMutes = async (dictionary: Dictionary, mutes: PunishmentListItem[]
       id: mute.id.toString(),
       time: new Date(parseInt(mute.time.toString())),
       status: until == dictionary.table.permanent ? 
-                (active ? true : false) : 
-                (until < new Date() ? false : undefined),
+                active : 
+                (until < new Date() ? false : (active ? undefined : false)),
       console: mute.banned_by_uuid === siteConfig.console.uuid,
       permanent: until == dictionary.table.permanent,
       active,
       until,
       name
     }
-  }));
+  });
 
   return sanitized;
 }

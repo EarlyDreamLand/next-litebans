@@ -1,38 +1,28 @@
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
 import { siteConfig } from "@config/site";
 import { PunishmentListItem } from "@/types";
 
 import { db } from "../db";
-import { getPlayerName } from "./punishment";
+import { getPlayerName, getPlayerNamesBatch } from "./punishment";
 import { Dictionary } from "../language/types";
 
-const banCountCache = new Map();
-const BAN_CACHE_TTL = 15 * 60 * 1000; // 15 min
+const getBanCountCached = unstable_cache(
+  async (player: string | null, staff: string | null) => {
+    return db.litebans_bans.count({
+      where: {
+        uuid: player ?? undefined,
+        banned_by_uuid: staff ?? undefined
+      }
+    });
+  },
+  ["ban-count"],
+  { revalidate: 900 }
+);
 
-const getBanCount = async (player?: string, staff?: string, useCache: boolean = true) => {
-  const cacheKey = `${player || 'null'}_${staff || 'null'}`;
-
-  if (useCache) {
-    const cached = banCountCache.get(cacheKey);
-    if (cached && (Date.now() - cached.timestamp) < BAN_CACHE_TTL) {
-      return cached.data;
-    }
-  }
-
-  const count = await db.litebans_bans.count({
-    where: {
-      uuid: player,
-      banned_by_uuid: staff
-    }
-  });
-  banCountCache.set(cacheKey, {
-    data: count,
-    timestamp: Date.now()
-  });
-
-  return count;
-}
+const getBanCount = (player?: string, staff?: string) =>
+  getBanCountCached(player ?? null, staff ?? null);
 
 const getBans = async (page: number, player?: string, staff?: string) => {
   const bans =  (await db.litebans_bans.findMany({
@@ -61,9 +51,11 @@ const getBans = async (page: number, player?: string, staff?: string) => {
 }
 
 const sanitizeBans = async (dictionary: Dictionary, bans: PunishmentListItem[]) => {
+  const uuids = bans.map(b => b.uuid).filter((u): u is string => !!u);
+  const nameMap = await getPlayerNamesBatch(uuids);
 
-  const sanitized = await Promise.all(bans.map(async (ban) => {
-    const name = await getPlayerName(ban.uuid!);
+  const sanitized = bans.map((ban) => {
+    const name = nameMap.get(ban.uuid!);
     const until = ban.until.toString() === "0" ? dictionary.table.permanent : new Date(parseInt(ban.until.toString()));
     const active = typeof ban.active === "boolean" ? ban.active : ban.active === "1";
     return {
@@ -72,14 +64,14 @@ const sanitizeBans = async (dictionary: Dictionary, bans: PunishmentListItem[]) 
       time: new Date(parseInt(ban.time.toString())),
       status: until == dictionary.table.permanent ? 
                 active : 
-                until < new Date() ? false : undefined,
+                (until < new Date() ? false : (active ? undefined : false)),
       console: ban.banned_by_uuid === siteConfig.console.uuid,
       permanent: until == dictionary.table.permanent,
       active,
       until,
       name,
     }
-  }));
+  });
 
   return sanitized;
 }

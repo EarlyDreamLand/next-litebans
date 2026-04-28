@@ -1,38 +1,27 @@
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
 import { siteConfig } from "@config/site";
 import { PunishmentListItem } from "@/types";
 
 import { db } from "../db";
-import { getPlayerName } from "./punishment";
+import { getPlayerNamesBatch } from "./punishment";
 
-const kickCountCache = new Map();
-const KICK_CACHE_TTL = 15 * 60 * 1000; // 15 min
+const getKickCountCached = unstable_cache(
+  async (player: string | null, staff: string | null) => {
+    return db.litebans_kicks.count({
+      where: {
+        uuid: player ?? undefined,
+        banned_by_uuid: staff ?? undefined
+      }
+    });
+  },
+  ["kick-count"],
+  { revalidate: 900 }
+);
 
-const getKickCount = async (player?: string, staff?: string, useCache: boolean = true) => {
-  const cacheKey = `${player || 'null'}_${staff || 'null'}`;
-
-  if (useCache) {
-    const cached = kickCountCache.get(cacheKey);
-    if (cached && (Date.now() - cached.timestamp) < KICK_CACHE_TTL) {
-      return cached.data;
-    }
-  }
-
-  const count = await db.litebans_kicks.count({
-    where: {
-      uuid: player,
-      banned_by_uuid: staff
-    }
-  });
-
-  kickCountCache.set(cacheKey, {
-    data: count,
-    timestamp: Date.now()
-  });
-
-  return count;
-}
+const getKickCount = (player?: string, staff?: string) =>
+  getKickCountCached(player ?? null, staff ?? null);
 
 const getKicks = async (page: number, player?: string, staff?: string) => {
   const kicks =  await db.litebans_kicks.findMany({
@@ -61,9 +50,11 @@ const getKicks = async (page: number, player?: string, staff?: string) => {
 }
 
 const sanitizeKicks = async (kicks: PunishmentListItem[]) => {
+  const uuids = kicks.map(k => k.uuid).filter((u): u is string => !!u);
+  const nameMap = await getPlayerNamesBatch(uuids);
 
-  const sanitized = await Promise.all(kicks.map(async (kick) => {
-    const name = await getPlayerName(kick.uuid!);
+  const sanitized = kicks.map((kick) => {
+    const name = nameMap.get(kick.uuid!);
     return {
       ...kick,
       id: kick.id.toString(),
@@ -72,7 +63,7 @@ const sanitizeKicks = async (kicks: PunishmentListItem[]) => {
       active: typeof kick.active === "boolean" ? kick.active : kick.active === "1",
       name
     }
-  }));
+  });
 
   return sanitized;
 }
