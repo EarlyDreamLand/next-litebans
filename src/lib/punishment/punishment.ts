@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { raw, sqltag } from "@prisma/client/runtime/library";
 import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { siteConfig } from "@config/site";
@@ -74,19 +75,19 @@ const getPunishments = async (page: number, player?: string, staff?: string) => 
 
     const rawPrefix = process.env.DATABASE_PREFIX ?? "litebans_";
     const prefix = /^[a-zA-Z0-9_]+$/.test(rawPrefix) ? rawPrefix : "litebans_";
-    const bansTable = Prisma.raw(`\`${prefix}bans\``);
-    const mutesTable = Prisma.raw(`\`${prefix}mutes\``);
-    const warningsTable = Prisma.raw(`\`${prefix}warnings\``);
-    const kicksTable = Prisma.raw(`\`${prefix}kicks\``);
+    const bansTable = raw(`\`${prefix}bans\``);
+    const mutesTable = raw(`\`${prefix}mutes\``);
+    const warningsTable = raw(`\`${prefix}warnings\``);
+    const kicksTable = raw(`\`${prefix}kicks\``);
 
-    const query = Prisma.sql`
+    const query = sqltag`
     SELECT * FROM (
       SELECT * FROM (
         SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'ban' AS type
         FROM ${bansTable}
         WHERE 1=1
-          ${player ? Prisma.sql`AND uuid = ${player}` : Prisma.sql``}
-          ${staff ? Prisma.sql`AND banned_by_uuid = ${staff}` : Prisma.sql``}
+          ${player ? sqltag`AND uuid = ${player}` : sqltag``}
+          ${staff ? sqltag`AND banned_by_uuid = ${staff}` : sqltag``}
         ORDER BY time DESC
           LIMIT ${subqueryLimit}
       ) bans
@@ -95,8 +96,8 @@ const getPunishments = async (page: number, player?: string, staff?: string) => 
         SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'mute' AS type
         FROM ${mutesTable}
         WHERE 1=1
-          ${player ? Prisma.sql`AND uuid = ${player}` : Prisma.sql``}
-          ${staff ? Prisma.sql`AND banned_by_uuid = ${staff}` : Prisma.sql``}
+          ${player ? sqltag`AND uuid = ${player}` : sqltag``}
+          ${staff ? sqltag`AND banned_by_uuid = ${staff}` : sqltag``}
         ORDER BY time DESC
           LIMIT ${subqueryLimit}
       ) mutes
@@ -105,8 +106,8 @@ const getPunishments = async (page: number, player?: string, staff?: string) => 
         SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'warn' AS type
         FROM ${warningsTable}
         WHERE 1=1
-          ${player ? Prisma.sql`AND uuid = ${player}` : Prisma.sql``}
-          ${staff ? Prisma.sql`AND banned_by_uuid = ${staff}` : Prisma.sql``}
+          ${player ? sqltag`AND uuid = ${player}` : sqltag``}
+          ${staff ? sqltag`AND banned_by_uuid = ${staff}` : sqltag``}
         ORDER BY time DESC
           LIMIT ${subqueryLimit}
       ) warns
@@ -115,8 +116,8 @@ const getPunishments = async (page: number, player?: string, staff?: string) => 
         SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'kick' AS type
         FROM ${kicksTable}
         WHERE 1=1
-          ${player ? Prisma.sql`AND uuid = ${player}` : Prisma.sql``}
-          ${staff ? Prisma.sql`AND banned_by_uuid = ${staff}` : Prisma.sql``}
+          ${player ? sqltag`AND uuid = ${player}` : sqltag``}
+          ${staff ? sqltag`AND banned_by_uuid = ${staff}` : sqltag``}
         ORDER BY time DESC
           LIMIT ${subqueryLimit}
       ) kicks
