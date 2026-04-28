@@ -1,5 +1,5 @@
 <div align="center">
-  <img style="width:100px;" src="https://cdn.yosoyvillaa.dev/uploads/next-litebans.png" alt="MelodyMine Logo">
+  <img style="width:100px;" src="docs/images/next-litebans.png" alt="MelodyMine Logo">
 
   <h1 style="font-size: 38px">next-litebans </h1>
 
