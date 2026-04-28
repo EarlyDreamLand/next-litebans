@@ -9,7 +9,7 @@ import { getPlayerNamesBatch } from "./punishment";
 
 const getWarnCountCached = unstable_cache(
   async (player: string | null, staff: string | null) => {
-    return db.litebans_warnings.count({
+    return db.warnings.count({
       where: {
         uuid: player ?? undefined,
         banned_by_uuid: staff ?? undefined
@@ -24,7 +24,7 @@ const getWarnCount = (player?: string, staff?: string) =>
   getWarnCountCached(player ?? null, staff ?? null);
 
 const getWarns = async (page: number, player?: string, staff?: string) => {
-  const warns =  await db.litebans_warnings.findMany({
+  const warns =  await db.warnings.findMany({
     where: {
       uuid: player,
       banned_by_uuid: staff
@@ -71,7 +71,7 @@ const sanitizeWarns = async (warns: (PunishmentListItem & { warned: boolean | st
 }
 
 const getWarn = async (id: number) => {
-  const warn = await db.litebans_warnings.findUnique({
+  const warn = await db.warnings.findUnique({
     where: {
       id
     },

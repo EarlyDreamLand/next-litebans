@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 
 export const checkPlayer = async (name: string) => {
-  const player = await db.litebans_history.findFirst({
+  const player = await db.history.findFirst({
     where: {
       name
     },

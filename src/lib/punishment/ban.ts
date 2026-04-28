@@ -10,7 +10,7 @@ import { Dictionary } from "../language/types";
 
 const getBanCountCached = unstable_cache(
   async (player: string | null, staff: string | null) => {
-    return db.litebans_bans.count({
+    return db.bans.count({
       where: {
         uuid: player ?? undefined,
         banned_by_uuid: staff ?? undefined
@@ -25,7 +25,7 @@ const getBanCount = (player?: string, staff?: string) =>
   getBanCountCached(player ?? null, staff ?? null);
 
 const getBans = async (page: number, player?: string, staff?: string) => {
-  const bans =  (await db.litebans_bans.findMany({
+  const bans =  (await db.bans.findMany({
     where: {
       uuid: player,
       banned_by_uuid: staff
@@ -77,7 +77,7 @@ const sanitizeBans = async (dictionary: Dictionary, bans: PunishmentListItem[]) 
 }
 
 const getBan = async (id: number, dictionary: Dictionary) => {
-  const ban = await db.litebans_bans.findUnique({
+  const ban = await db.bans.findUnique({
     where: {
       id
     },

@@ -33,7 +33,7 @@ const getPunishmentCount = cache(
 );
 
 const getPlayerName = async (uuid: string) => {
-  const player = await db.litebans_history.findFirst({
+  const player = await db.history.findFirst({
     where: {
       uuid
     },
@@ -52,7 +52,7 @@ const getPlayerNamesBatch = async (uuids: string[]): Promise<Map<string, string 
   const uniqueUuids = [...new Set(uuids.filter((u): u is string => !!u))];
   if (uniqueUuids.length === 0) return new Map();
 
-  const players = await db.litebans_history.findMany({
+  const players = await db.history.findMany({
     where: { uuid: { in: uniqueUuids } },
     orderBy: { date: 'desc' },
     select: { uuid: true, name: true }
@@ -76,7 +76,7 @@ const getPunishments = async (page: number, player?: string, staff?: string) => 
     SELECT * FROM (
       SELECT * FROM (
         SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'ban' AS type
-        FROM litebans_bans
+        FROM bans
         WHERE 1=1
           ${player ? Prisma.sql`AND uuid = ${player}` : Prisma.sql``}
           ${staff ? Prisma.sql`AND banned_by_uuid = ${staff}` : Prisma.sql``}
@@ -86,7 +86,7 @@ const getPunishments = async (page: number, player?: string, staff?: string) => 
       UNION ALL
       SELECT * FROM (
         SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'mute' AS type
-        FROM litebans_mutes
+        FROM mutes
         WHERE 1=1
           ${player ? Prisma.sql`AND uuid = ${player}` : Prisma.sql``}
           ${staff ? Prisma.sql`AND banned_by_uuid = ${staff}` : Prisma.sql``}
@@ -96,7 +96,7 @@ const getPunishments = async (page: number, player?: string, staff?: string) => 
       UNION ALL
       SELECT * FROM (
         SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'warn' AS type
-        FROM litebans_warnings
+        FROM warnings
         WHERE 1=1
           ${player ? Prisma.sql`AND uuid = ${player}` : Prisma.sql``}
           ${staff ? Prisma.sql`AND banned_by_uuid = ${staff}` : Prisma.sql``}
@@ -106,7 +106,7 @@ const getPunishments = async (page: number, player?: string, staff?: string) => 
       UNION ALL
       SELECT * FROM (
         SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'kick' AS type
-        FROM litebans_kicks
+        FROM kicks
         WHERE 1=1
           ${player ? Prisma.sql`AND uuid = ${player}` : Prisma.sql``}
           ${staff ? Prisma.sql`AND banned_by_uuid = ${staff}` : Prisma.sql``}

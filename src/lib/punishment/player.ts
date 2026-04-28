@@ -5,7 +5,7 @@ import {getMuteCount} from "@/lib/punishment/mute";
 import {getBanCount} from "@/lib/punishment/ban";
 
 const getPlayerByName = async (name: string) => {
-  const player = await db.litebans_history.findFirst({
+  const player = await db.history.findFirst({
     where: {
       name
     },

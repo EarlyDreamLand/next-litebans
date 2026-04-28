@@ -9,7 +9,7 @@ import { getPlayerNamesBatch } from "./punishment";
 
 const getKickCountCached = unstable_cache(
   async (player: string | null, staff: string | null) => {
-    return db.litebans_kicks.count({
+    return db.kicks.count({
       where: {
         uuid: player ?? undefined,
         banned_by_uuid: staff ?? undefined
@@ -24,7 +24,7 @@ const getKickCount = (player?: string, staff?: string) =>
   getKickCountCached(player ?? null, staff ?? null);
 
 const getKicks = async (page: number, player?: string, staff?: string) => {
-  const kicks =  await db.litebans_kicks.findMany({
+  const kicks =  await db.kicks.findMany({
     where: {
       uuid: player,
       banned_by_uuid: staff
@@ -69,7 +69,7 @@ const sanitizeKicks = async (kicks: PunishmentListItem[]) => {
 }
 
 const getKick = async (id: number) => {
-  const kick = await db.litebans_kicks.findUnique({
+  const kick = await db.kicks.findUnique({
     where: {
       id
     },
