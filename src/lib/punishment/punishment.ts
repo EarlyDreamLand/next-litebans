@@ -72,7 +72,8 @@ const getPunishments = async (page: number, player?: string, staff?: string) => 
     const offset = (page - 1) * pageSize;
     const subqueryLimit = offset + pageSize;
 
-    const prefix = process.env.DATABASE_PREFIX ?? "litebans_";
+    const rawPrefix = process.env.DATABASE_PREFIX ?? "litebans_";
+    const prefix = /^[a-zA-Z0-9_]+$/.test(rawPrefix) ? rawPrefix : "litebans_";
     const bansTable = Prisma.raw(`\`${prefix}bans\``);
     const mutesTable = Prisma.raw(`\`${prefix}mutes\``);
     const warningsTable = Prisma.raw(`\`${prefix}warnings\``);
