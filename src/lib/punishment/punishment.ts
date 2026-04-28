@@ -72,11 +72,17 @@ const getPunishments = async (page: number, player?: string, staff?: string) => 
     const offset = (page - 1) * pageSize;
     const subqueryLimit = offset + pageSize;
 
+    const prefix = process.env.DATABASE_PREFIX ?? "litebans_";
+    const bansTable = Prisma.raw(`\`${prefix}bans\``);
+    const mutesTable = Prisma.raw(`\`${prefix}mutes\``);
+    const warningsTable = Prisma.raw(`\`${prefix}warnings\``);
+    const kicksTable = Prisma.raw(`\`${prefix}kicks\``);
+
     const query = Prisma.sql`
     SELECT * FROM (
       SELECT * FROM (
         SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'ban' AS type
-        FROM bans
+        FROM ${bansTable}
         WHERE 1=1
           ${player ? Prisma.sql`AND uuid = ${player}` : Prisma.sql``}
           ${staff ? Prisma.sql`AND banned_by_uuid = ${staff}` : Prisma.sql``}
@@ -86,7 +92,7 @@ const getPunishments = async (page: number, player?: string, staff?: string) => 
       UNION ALL
       SELECT * FROM (
         SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'mute' AS type
-        FROM mutes
+        FROM ${mutesTable}
         WHERE 1=1
           ${player ? Prisma.sql`AND uuid = ${player}` : Prisma.sql``}
           ${staff ? Prisma.sql`AND banned_by_uuid = ${staff}` : Prisma.sql``}
@@ -96,7 +102,7 @@ const getPunishments = async (page: number, player?: string, staff?: string) => 
       UNION ALL
       SELECT * FROM (
         SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'warn' AS type
-        FROM warnings
+        FROM ${warningsTable}
         WHERE 1=1
           ${player ? Prisma.sql`AND uuid = ${player}` : Prisma.sql``}
           ${staff ? Prisma.sql`AND banned_by_uuid = ${staff}` : Prisma.sql``}
@@ -106,7 +112,7 @@ const getPunishments = async (page: number, player?: string, staff?: string) => 
       UNION ALL
       SELECT * FROM (
         SELECT id, uuid, banned_by_name, banned_by_uuid, reason, time, until, active, 'kick' AS type
-        FROM kicks
+        FROM ${kicksTable}
         WHERE 1=1
           ${player ? Prisma.sql`AND uuid = ${player}` : Prisma.sql``}
           ${staff ? Prisma.sql`AND banned_by_uuid = ${staff}` : Prisma.sql``}
